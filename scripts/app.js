@@ -15,6 +15,7 @@ const icon = document.querySelector(".icon img");
 const updateCity = async (city) => {
   const cityDets = await getCityKey(city);
   const weather = await getCurrentConditions(cityDets.Key);
+
   return {
     cityDets,
     weather,
@@ -33,8 +34,8 @@ const updateUI = (data) => {
   `;
 
   //update the night/dat & icon images
-  let timeSrc = null;
-  timeSrc = weather.IsDayTime
+
+  let timeSrc = weather.IsDayTime
     ? "./images/icons/day.svg"
     : "./images/icons/night.svg";
   time.setAttribute("src", timeSrc);
@@ -42,14 +43,25 @@ const updateUI = (data) => {
 
   //remove the d-none class if present
   card.classList.contains("d-none") && card.classList.remove("d-none");
-  console.log(cityDets, weather);
 };
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
+
   updateCity(e.target.city.value)
     .then((data) => updateUI(data))
     .catch((e) => console.log(e));
 
+  //set local storage
+  localStorage.setItem("city", e.target.city.value);
+
   e.target.reset();
 });
+
+//show info on load
+let savedCity = localStorage.getItem("city");
+if (savedCity) {
+  updateCity(savedCity)
+    .then((data) => updateUI(data))
+    .catch((e) => console.log(e));
+}
